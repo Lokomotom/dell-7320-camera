@@ -1,0 +1,116 @@
+warning: %source_date_epoch_from_changelog is set, but %changelog has no entries to take a date from
+Executing(%mkbuilddir): /bin/sh -e /tmp/dell7320-rpm-4/tmp/rpm-tmp.mg34FG
+Executing(%prep): /bin/sh -e /tmp/dell7320-rpm-4/tmp/rpm-tmp.Zh9jpA
++ umask 022
++ cd /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build
++ RPM_EC=0
+++ jobs -p
++ exit 0
+Executing(%build): /bin/sh -e /tmp/dell7320-rpm-4/tmp/rpm-tmp.1ef9qO
++ umask 022
++ cd /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build
++ CFLAGS='-O2 -flto=auto -ffat-lto-objects -fexceptions -g -grecord-gcc-switches -pipe -Wall -Werror=format-security -Wp,-U_FORTIFY_SOURCE,-D_FORTIFY_SOURCE=3 -Wp,-D_GLIBCXX_ASSERTIONS -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -m64 -march=x86-64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection -mtls-dialect=gnu2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer  '
++ export CFLAGS
++ CXXFLAGS='-O2 -flto=auto -ffat-lto-objects -fexceptions -g -grecord-gcc-switches -pipe -Wall -Werror=format-security -Wp,-U_FORTIFY_SOURCE,-D_FORTIFY_SOURCE=3 -Wp,-D_GLIBCXX_ASSERTIONS -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -m64 -march=x86-64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection -mtls-dialect=gnu2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer  '
++ export CXXFLAGS
++ FFLAGS='-O2 -flto=auto -ffat-lto-objects -fexceptions -g -grecord-gcc-switches -pipe -Wall -Wp,-U_FORTIFY_SOURCE,-D_FORTIFY_SOURCE=3 -Wp,-D_GLIBCXX_ASSERTIONS -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -m64 -march=x86-64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection -mtls-dialect=gnu2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -I/usr/lib64/gfortran/modules  '
++ export FFLAGS
++ FCFLAGS='-O2 -flto=auto -ffat-lto-objects -fexceptions -g -grecord-gcc-switches -pipe -Wall -Wp,-U_FORTIFY_SOURCE,-D_FORTIFY_SOURCE=3 -Wp,-D_GLIBCXX_ASSERTIONS -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -m64 -march=x86-64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection -mtls-dialect=gnu2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -I/usr/lib64/gfortran/modules  '
++ export FCFLAGS
++ VALAFLAGS=-g
++ export VALAFLAGS
++ RUSTFLAGS='-Copt-level=3 -Cdebuginfo=2 -Ccodegen-units=1 -Cstrip=none -Cforce-frame-pointers=yes -Clink-arg=-specs=/usr/lib/rpm/redhat/redhat-package-notes --cap-lints=warn'
++ export RUSTFLAGS
++ LDFLAGS='-Wl,-z,relro -Wl,--as-needed  -Wl,-z,pack-relative-relocs -Wl,-z,now -specs=/usr/lib/rpm/redhat/redhat-hardened-ld -specs=/usr/lib/rpm/redhat/redhat-hardened-ld-errors -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -Wl,--build-id=sha1 -specs=/usr/lib/rpm/redhat/redhat-package-notes  '
++ export LDFLAGS
++ LT_SYS_LIBRARY_PATH=/usr/lib64:
++ export LT_SYS_LIBRARY_PATH
++ CC=gcc
++ export CC
++ CXX=g++
++ export CXX
++ RPM_EC=0
+++ jobs -p
++ exit 0
+Executing(%install): /bin/sh -e /tmp/dell7320-rpm-4/tmp/rpm-tmp.ivXLBJ
++ umask 022
++ cd /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build
++ '[' /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build/BUILDROOT '!=' / ']'
++ rm -rf /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build/BUILDROOT
+++ dirname /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build/BUILDROOT
++ mkdir -p /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build
++ mkdir /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build/BUILDROOT
++ CFLAGS='-O2 -flto=auto -ffat-lto-objects -fexceptions -g -grecord-gcc-switches -pipe -Wall -Werror=format-security -Wp,-U_FORTIFY_SOURCE,-D_FORTIFY_SOURCE=3 -Wp,-D_GLIBCXX_ASSERTIONS -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -m64 -march=x86-64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection -mtls-dialect=gnu2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer  '
++ export CFLAGS
++ CXXFLAGS='-O2 -flto=auto -ffat-lto-objects -fexceptions -g -grecord-gcc-switches -pipe -Wall -Werror=format-security -Wp,-U_FORTIFY_SOURCE,-D_FORTIFY_SOURCE=3 -Wp,-D_GLIBCXX_ASSERTIONS -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -m64 -march=x86-64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection -mtls-dialect=gnu2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer  '
++ export CXXFLAGS
++ FFLAGS='-O2 -flto=auto -ffat-lto-objects -fexceptions -g -grecord-gcc-switches -pipe -Wall -Wp,-U_FORTIFY_SOURCE,-D_FORTIFY_SOURCE=3 -Wp,-D_GLIBCXX_ASSERTIONS -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -m64 -march=x86-64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection -mtls-dialect=gnu2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -I/usr/lib64/gfortran/modules  '
++ export FFLAGS
++ FCFLAGS='-O2 -flto=auto -ffat-lto-objects -fexceptions -g -grecord-gcc-switches -pipe -Wall -Wp,-U_FORTIFY_SOURCE,-D_FORTIFY_SOURCE=3 -Wp,-D_GLIBCXX_ASSERTIONS -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -m64 -march=x86-64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection -mtls-dialect=gnu2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -I/usr/lib64/gfortran/modules  '
++ export FCFLAGS
++ VALAFLAGS=-g
++ export VALAFLAGS
++ RUSTFLAGS='-Copt-level=3 -Cdebuginfo=2 -Ccodegen-units=1 -Cstrip=none -Cforce-frame-pointers=yes -Clink-arg=-specs=/usr/lib/rpm/redhat/redhat-package-notes --cap-lints=warn'
++ export RUSTFLAGS
++ LDFLAGS='-Wl,-z,relro -Wl,--as-needed  -Wl,-z,pack-relative-relocs -Wl,-z,now -specs=/usr/lib/rpm/redhat/redhat-hardened-ld -specs=/usr/lib/rpm/redhat/redhat-hardened-ld-errors -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -Wl,--build-id=sha1 -specs=/usr/lib/rpm/redhat/redhat-package-notes  '
++ export LDFLAGS
++ LT_SYS_LIBRARY_PATH=/usr/lib64:
++ export LT_SYS_LIBRARY_PATH
++ CC=gcc
++ export CC
++ CXX=g++
++ export CXX
++ install -D -m 0644 /tmp/dell7320-rpm-4/SOURCES/intel_skl_int3472_tps68470.ko /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build/BUILDROOT/usr/lib/modules/7.2.7-200.fc44.x86_64/kernel/drivers/platform/x86/intel/int3472/intel_skl_int3472_tps68470.ko
++ install -D -m 0644 /tmp/dell7320-rpm-4/SOURCES/ov5675.ko /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build/BUILDROOT/usr/lib/modules/7.2.7-200.fc44.x86_64/kernel/drivers/media/i2c/ov5675.ko
++ install -D -m 0644 /tmp/dell7320-rpm-4/SOURCES/ipu-bridge.ko /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build/BUILDROOT/usr/lib/modules/7.2.7-200.fc44.x86_64/kernel/drivers/media/pci/intel/ipu-bridge.ko
++ install -D -m 0644 /tmp/dell7320-rpm-4/SOURCES/dell-7320-camera.conf /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build/BUILDROOT/usr/lib/modules-load.d/dell-7320-camera.conf
++ xz -f -T0 --check=crc32 /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build/BUILDROOT/usr/lib/modules/7.2.7-200.fc44.x86_64/kernel/drivers/platform/x86/intel/int3472/intel_skl_int3472_tps68470.ko
++ xz -f -T0 --check=crc32 /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build/BUILDROOT/usr/lib/modules/7.2.7-200.fc44.x86_64/kernel/drivers/media/i2c/ov5675.ko
++ xz -f -T0 --check=crc32 /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build/BUILDROOT/usr/lib/modules/7.2.7-200.fc44.x86_64/kernel/drivers/media/pci/intel/ipu-bridge.ko
++ /usr/lib/rpm/check-buildroot
++ /usr/lib/rpm/redhat/brp-ldconfig
++ COMPRESS='gzip -9 -n'
++ COMPRESS_EXT=.gz
++ /usr/lib/rpm/brp-compress
++ /usr/lib/rpm/brp-strip /usr/bin/strip
++ /usr/lib/rpm/brp-strip-comment-note /usr/bin/strip /usr/bin/objdump
++ /usr/lib/rpm/redhat/brp-strip-lto /usr/bin/strip
++ /usr/lib/rpm/check-rpaths
++ /usr/lib/rpm/redhat/brp-mangle-shebangs
++ /usr/lib/rpm/brp-remove-la-files
++ /usr/lib/rpm/redhat/brp-python-rpm-in-distinfo
++ env /usr/lib/rpm/redhat/brp-python-bytecompile '' 1 0 -j8
++ /usr/lib/rpm/redhat/brp-python-hardlink
++ /usr/bin/add-det --brp -j8 /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build/BUILDROOT
+Handler jar skipped: jar handler requires $SOURCE_DATE_EPOCH to be set
+Handler gzip skipped: gzip handler requires $SOURCE_DATE_EPOCH to be set
+Handler zip skipped: zip handler requires $SOURCE_DATE_EPOCH to be set
+Scanned 16 directories and 4 files,
+    processed 0 inodes,
+    0 modified (0 replaced + 0 rewritten),
+    0 unsupported format, 0 errors
++ /usr/bin/linkdupes --brp /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build/BUILDROOT/usr
+Scanned 15 directories and 4 files,
+    considered 4 files, read 0 files, linked 0 files, 0 errors
+    sum of sizes of linked files: 0 bytes
+Processing files: dell-7320-camera-kmods-0.1-3.fc44.x86_64
+Provides: dell-7320-camera-kmods = 0.1-3.fc44 dell-7320-camera-kmods(x86-64) = 0.1-3.fc44
+Requires(interp): /bin/sh /bin/sh
+Requires(rpmlib): rpmlib(CompressedFileNames) <= 3.0.4-1 rpmlib(FileDigests) <= 4.6.0-1 rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+Requires(post): /bin/sh
+Requires(postun): /bin/sh
+Checking for unpackaged file(s): /usr/lib/rpm/check-files /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build/BUILDROOT
+Wrote: /tmp/dell7320-rpm-4/RPMS/x86_64/dell-7320-camera-kmods-0.1-3.fc44.x86_64.rpm
+Executing(rmbuild): /bin/sh -e /tmp/dell7320-rpm-4/tmp/rpm-tmp.dDmuk1
++ umask 022
++ cd /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build
++ test -d /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build
++ /usr/bin/chmod -Rf a+rX,u+w,g-w,o-w /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build
++ rm -rf /tmp/dell7320-rpm-4/BUILD/dell-7320-camera-kmods-0.1-build
++ RPM_EC=0
+++ jobs -p
++ exit 0
+
+RPM build warnings:
+    %source_date_epoch_from_changelog is set, but %changelog has no entries to take a date from
+RPM built locally in /var/home/lokomotom/VS Code Projects/dell-7320-camera/build/rpm. It has not been installed.

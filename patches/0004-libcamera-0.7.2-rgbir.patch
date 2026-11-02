@@ -1,0 +1,252 @@
+diff --git a/src/libcamera/software_isp/debayer_cpu.cpp b/src/libcamera/software_isp/debayer_cpu.cpp
+index 49382b4..5f1ecec 100644
+--- a/src/libcamera/software_isp/debayer_cpu.cpp
++++ b/src/libcamera/software_isp/debayer_cpu.cpp
+@@ -12,6 +12,7 @@
+ #include "debayer_cpu.h"
+ 
+ #include <algorithm>
++#include <cstring>
+ #include <stdlib.h>
+ #include <sys/ioctl.h>
+ #include <utility>
+@@ -19,6 +20,7 @@
+ #include <linux/dma-buf.h>
+ 
+ #include <libcamera/base/thread.h>
++#include <libcamera/base/utils.h>
+ 
+ #include <libcamera/formats.h>
+ 
+@@ -643,10 +645,76 @@ int DebayerCpu::configure(const StreamConfiguration &inputCfg,
+ 			  const std::vector<std::reference_wrapper<const StreamConfiguration>> &outputCfgs,
+ 			  bool ccmEnabled)
+ {
+-	if (getInputConfig(inputCfg.pixelFormat, inputConfig_) != 0)
++	StreamConfiguration debayerInputCfg = inputCfg;
++	PixelFormat debayerPixelFormat = inputCfg.pixelFormat;
++	rgbIr_.reset();
++
++	if (utils::secure_getenv("LIBCAMERA_RGBIR")) {
++		BayerFormat raw = BayerFormat::fromPixelFormat(inputCfg.pixelFormat);
++		if (raw.bitDepth != 10 ||
++		    (raw.packing != BayerFormat::Packing::None &&
++		     raw.packing != BayerFormat::Packing::CSI2)) {
++			LOG(Debayer, Error)
++				<< "RGB-IR pre-pass supports unpacked or CSI-2 packed RAW10, got "
++				<< debayerPixelFormat.toString();
++			return -EINVAL;
++		}
++
++		switch (raw.order) {
++		case BayerFormat::BGGR: rgbIrOrder_ = RgbIrToBayer::Order::BGGR; break;
++		case BayerFormat::GBRG: rgbIrOrder_ = RgbIrToBayer::Order::GBRG; break;
++		case BayerFormat::GRBG: rgbIrOrder_ = RgbIrToBayer::Order::GRBG; break;
++		case BayerFormat::RGGB: rgbIrOrder_ = RgbIrToBayer::Order::RGGB; break;
++		default:
++			LOG(Debayer, Error) << "Unsupported Bayer order for RGB-IR";
++			return -EINVAL;
++		}
++
++		/*
++		 * Dell's OV5678 module is mounted 180 degrees from the driver's
++		 * nominal Bayer phase. The RGB-IR samples are correct, but red and
++		 * blue positions are reversed. Allow an explicit output-phase
++		 * override while keeping the input format used by the downstream
++		 * debayer and statistics unchanged.
++		 */
++		const char *rgbIrOrder = utils::secure_getenv("RGBIR_ORDER");
++		if (rgbIrOrder && !std::strcmp(rgbIrOrder, "GBRG"))
++			rgbIrOrder_ = RgbIrToBayer::Order::GBRG;
++		else if (rgbIrOrder && !std::strcmp(rgbIrOrder, "GRBG"))
++			rgbIrOrder_ = RgbIrToBayer::Order::GRBG;
++
++		rgbIrInputPacked_ = raw.packing == BayerFormat::Packing::CSI2;
++		raw.packing = BayerFormat::Packing::None;
++		debayerPixelFormat = raw.toPixelFormat();
++		if (!debayerPixelFormat || inputCfg.size.width % 4 ||
++		    inputCfg.size.height % 4) {
++			LOG(Debayer, Error) << "Unsupported dimensions or RGB-IR Bayer format";
++			return -EINVAL;
++		}
++
++		rgbIrInputSize_ = inputCfg.size;
++		rgbIrSourceStride_ = inputCfg.stride;
++		rgbIrOutputStride_ = (inputCfg.size.width + 7) & ~7U;
++		debayerInputCfg.pixelFormat = debayerPixelFormat;
++		debayerInputCfg.size = Size(inputCfg.size.width / 2,
++					    inputCfg.size.height / 2);
++		debayerInputCfg.stride = rgbIrOutputStride_;
++		rgbIrScratch_.resize((rgbIrOutputStride_ / 2) *
++				     debayerInputCfg.size.height);
++		rgbIr_ = std::make_unique<RgbIrToBayer>();
++
++		const char *irSubtract = utils::secure_getenv("RGBIR_IRSUB");
++		rgbIrIrSubtract_ = irSubtract
++				   ? std::max(0.0f, static_cast<float>(atof(irSubtract)))
++				   : 0.0f;
++		LOG(Debayer, Info) << "RGB-IR pre-pass enabled for " << inputCfg.size
++				   << (rgbIrInputPacked_ ? " (CSI-2 packed RAW10)" : " (unpacked RAW10)");
++	}
++
++	if (getInputConfig(debayerPixelFormat, inputConfig_) != 0)
+ 		return -EINVAL;
+ 
+-	if (stats_->configure(inputCfg, threads_.size()) != 0)
++	if (stats_->configure(debayerInputCfg, threads_.size()) != 0)
+ 		return -EINVAL;
+ 
+ 	const Size &statsPatternSize = stats_->patternSize();
+@@ -658,7 +726,7 @@ int DebayerCpu::configure(const StreamConfiguration &inputCfg,
+ 		return -EINVAL;
+ 	}
+ 
+-	inputConfig_.stride = inputCfg.stride;
++	inputConfig_.stride = debayerInputCfg.stride;
+ 
+ 	if (outputCfgs.size() != 1) {
+ 		LOG(Debayer, Error)
+@@ -668,7 +736,7 @@ int DebayerCpu::configure(const StreamConfiguration &inputCfg,
+ 	}
+ 
+ 	const StreamConfiguration &outputCfg = outputCfgs[0];
+-	SizeRange outSizeRange = sizes(inputCfg.pixelFormat, inputCfg.size);
++	SizeRange outSizeRange = sizes(debayerPixelFormat, inputCfg.size);
+ 	std::tie(outputConfig_.stride, outputConfig_.frameSize) =
+ 		strideAndFrameSize(outputCfg.pixelFormat, outputCfg.size);
+ 
+@@ -680,7 +748,7 @@ int DebayerCpu::configure(const StreamConfiguration &inputCfg,
+ 		return -EINVAL;
+ 	}
+ 
+-	int ret = setDebayerFunctions(inputCfg.pixelFormat,
++	int ret = setDebayerFunctions(debayerPixelFormat,
+ 				      outputCfg.pixelFormat,
+ 				      ccmEnabled);
+ 	if (ret != 0)
+@@ -696,9 +764,14 @@ int DebayerCpu::configure(const StreamConfiguration &inputCfg,
+ 	 */
+ 	params_.gamma = 1.0;
+ 
+-	window_.x = ((inputCfg.size.width - outputCfg.size.width) / 2) &
++	if (outputCfg.size.width > debayerInputCfg.size.width ||
++	    outputCfg.size.height > debayerInputCfg.size.height) {
++		LOG(Debayer, Error) << "RGB-IR output exceeds half-resolution input";
++		return -EINVAL;
++	}
++	window_.x = ((debayerInputCfg.size.width - outputCfg.size.width) / 2) &
+ 		    ~(inputConfig_.patternSize.width - 1);
+-	window_.y = ((inputCfg.size.height - outputCfg.size.height) / 2) &
++	window_.y = ((debayerInputCfg.size.height - outputCfg.size.height) / 2) &
+ 		    ~(inputConfig_.patternSize.height - 1);
+ 	window_.width = outputCfg.size.width;
+ 	window_.height = outputCfg.size.height;
+@@ -1091,6 +1164,21 @@ void DebayerCpu::process(uint32_t frame, FrameBuffer *input, FrameBuffer *output
+ 
+ 	stats_->startFrame(frame);
+ 
++	const uint8_t *srcData = in.planes()[0].data();
++	if (rgbIr_) {
++		const int ret = rgbIr_->convert(srcData, rgbIrInputSize_.width,
++					       rgbIrInputSize_.height,
++					       rgbIrSourceStride_, rgbIrInputPacked_,
++					       rgbIrScratch_.data(), rgbIrOutputStride_,
++					       rgbIrOrder_, rgbIrIrSubtract_);
++		if (ret) {
++			LOG(Debayer, Error) << "RGB-IR conversion failed: " << ret;
++			metadata.status = FrameMetadata::FrameError;
++			return;
++		}
++		srcData = reinterpret_cast<const uint8_t *>(rgbIrScratch_.data());
++	}
++
+ 	workPendingMutex_.lock();
+ 	workPending_ = (1 << threads_.size()) - 1;
+ 	workPendingMutex_.unlock();
+@@ -1098,7 +1186,7 @@ void DebayerCpu::process(uint32_t frame, FrameBuffer *input, FrameBuffer *output
+ 	for (auto &thread : threads_)
+ 		thread->invokeMethod(&DebayerCpuThread::process,
+ 				     ConnectionTypeQueued, frame,
+-				     in.planes()[0].data(), out.planes()[0].data());
++				     srcData, out.planes()[0].data());
+ 
+ 	{
+ 		MutexLocker locker(workPendingMutex_);
+@@ -1143,6 +1231,16 @@ void DebayerCpu::stop()
+ 
+ SizeRange DebayerCpu::sizes(PixelFormat inputFormat, const Size &inputSize)
+ {
++	Size debayerInputSize = inputSize;
++	if (utils::secure_getenv("LIBCAMERA_RGBIR")) {
++		const BayerFormat bayer = BayerFormat::fromPixelFormat(inputFormat);
++		if (bayer.bitDepth == 10 &&
++		    (bayer.packing == BayerFormat::Packing::None ||
++		     bayer.packing == BayerFormat::Packing::CSI2))
++			debayerInputSize = Size(inputSize.width / 2,
++						inputSize.height / 2);
++	}
++
+ 	Size patternSize = this->patternSize(inputFormat);
+ 	unsigned int borderHeight = patternSize.height;
+ 
+@@ -1157,16 +1255,16 @@ SizeRange DebayerCpu::sizes(PixelFormat inputFormat, const Size &inputSize)
+ 	 * For debayer interpolation a border is kept around the entire image
+ 	 * and the minimum output size is pattern-height x pattern-width.
+ 	 */
+-	if (inputSize.width < (3 * patternSize.width) ||
+-	    inputSize.height < (2 * borderHeight + patternSize.height)) {
++	if (debayerInputSize.width < (3 * patternSize.width) ||
++	    debayerInputSize.height < (2 * borderHeight + patternSize.height)) {
+ 		LOG(Debayer, Warning)
+-			<< "Input format size too small: " << inputSize.toString();
++			<< "Input format size too small: " << debayerInputSize.toString();
+ 		return {};
+ 	}
+ 
+ 	return SizeRange(Size(patternSize.width, patternSize.height),
+-			 Size((inputSize.width - 2 * patternSize.width) & ~(patternSize.width - 1),
+-			      (inputSize.height - 2 * borderHeight) & ~(patternSize.height - 1)),
++			 Size((debayerInputSize.width - 2 * patternSize.width) & ~(patternSize.width - 1),
++			      (debayerInputSize.height - 2 * borderHeight) & ~(patternSize.height - 1)),
+ 			 patternSize.width, patternSize.height);
+ }
+ 
+diff --git a/src/libcamera/software_isp/debayer_cpu.h b/src/libcamera/software_isp/debayer_cpu.h
+index 5281c65..0bf83be 100644
+--- a/src/libcamera/software_isp/debayer_cpu.h
++++ b/src/libcamera/software_isp/debayer_cpu.h
+@@ -25,6 +25,7 @@
+ #include "libcamera/internal/software_isp/swstats_cpu.h"
+ 
+ #include "debayer.h"
++#include "rgbir_to_bayer.h"
+ 
+ namespace libcamera {
+ 
+@@ -154,6 +155,14 @@ private:
+ 	debayerFn debayer2_;
+ 	debayerFn debayer3_;
+ 	Rectangle window_;
++	std::unique_ptr<RgbIrToBayer> rgbIr_;
++	std::vector<uint16_t> rgbIrScratch_;
++	Size rgbIrInputSize_;
++	unsigned int rgbIrSourceStride_ = 0;
++	unsigned int rgbIrOutputStride_ = 0;
++	bool rgbIrInputPacked_ = false;
++	RgbIrToBayer::Order rgbIrOrder_ = RgbIrToBayer::Order::GBRG;
++	float rgbIrIrSubtract_ = 0.0f;
+ 	std::unique_ptr<SwStatsCpu> stats_;
+ 	unsigned int xShift_; /* Offset of 0/1 applied to window_.x */
+ 
+diff --git a/src/libcamera/software_isp/meson.build b/src/libcamera/software_isp/meson.build
+index 15f9e40..31b27d9 100644
+--- a/src/libcamera/software_isp/meson.build
++++ b/src/libcamera/software_isp/meson.build
+@@ -23,6 +23,7 @@ libcamera_internal_sources += files([
+     'benchmark.cpp',
+     'debayer.cpp',
+     'debayer_cpu.cpp',
++    'rgbir_to_bayer.cpp',
+     'software_isp.cpp',
+     'swstats_cpu.cpp',
+ ])

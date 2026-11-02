@@ -1,0 +1,23 @@
+diff --git a/src/ipa/simple/algorithms/awb.cpp b/src/ipa/simple/algorithms/awb.cpp
+index 05155c8..98231ae 100644
+--- a/src/ipa/simple/algorithms/awb.cpp
++++ b/src/ipa/simple/algorithms/awb.cpp
+@@ -75,13 +75,15 @@ void Awb::process(IPAContext &context,
+ 
+ 	/*
+ 	 * Calculate red and blue gains for AWB.
+-	 * Clamp max gain at 4.0, this also avoids 0 division.
++	 * Clamp max gain at 8.0, this also avoids 0 division. Some sensors
++	 * (including the OV5678 RGB-IR module) have a weak red response and
++	 * need more than the previous 4.0 limit to reach neutral.
+ 	 */
+ 	auto &gains = context.activeState.awb.gains;
+ 	gains = { {
+-		sum.r() <= sum.g() / 4 ? 4.0f : static_cast<float>(sum.g()) / sum.r(),
++		sum.r() <= sum.g() / 8 ? 8.0f : static_cast<float>(sum.g()) / sum.r(),
+ 		1.0,
+-		sum.b() <= sum.g() / 4 ? 4.0f : static_cast<float>(sum.g()) / sum.b(),
++		sum.b() <= sum.g() / 8 ? 8.0f : static_cast<float>(sum.g()) / sum.b(),
+ 	} };
+ 
+ 	RGB<double> rgbGains{ { 1 / gains.r(), 1 / gains.g(), 1 / gains.b() } };

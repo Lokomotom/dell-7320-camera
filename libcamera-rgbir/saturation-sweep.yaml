@@ -1,0 +1,10 @@
+# Compare saturation only; AWB and exposure continue to adapt.
+frames:
+  - 4:
+      Saturation: 1.0
+  - 9:
+      Saturation: 1.25
+  - 14:
+      Saturation: 1.5
+  - 19:
+      Saturation: 1.75

@@ -1,0 +1,4 @@
+# Apply the selected 1.5 saturation for the entire capture session.
+frames:
+  - 0:
+      Saturation: 1.5
