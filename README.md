@@ -9,6 +9,7 @@ Lokální projekt pro experimentální zpřístupnění přední OV5678 kamery p
 - libcamera/libcamera-tools: `0.7.2-2.fc44`.
 - Kamera se v ACPI hlásí jako `OVTI5678:00`; její napájecí řadič je `INT3472:07`.
 - Aktivní RPM `0.1-3` pro kernel `7.2.7-200.fc44.x86_64`; moduly byly úspěšně načteny a při startu se automaticky načítají.
+- Převod kernelového RPM na akmod je připravený. Akmod sestavuje moduly pro kernel s odpovídajícím `kernel-devel`; nový balíček zatím není nainstalovaný. Postup a omezení jsou v [dokumentaci akmodu](docs/akmod.md).
 - Kernel potvrzuje TPS68470 revizi `0x21`, dva připojené senzory a podporovaný `OVTI5678:00`.
 - libcamera `cam -l` uvádí `Internal front camera`; jeden PPM snímek `2584×1944` byl úspěšně zachycen.
 

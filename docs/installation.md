@@ -7,6 +7,13 @@
 - Systémový libcamera je `0.7.2-2.fc44`.
 - RGB-IR patche a barevný profil běží v izolovaném buildu `/tmp/libcamera-port`; systémová libcamera není nahrazena.
 
+## Kernel module updates
+
+The installed camera RPM is currently still the legacy exact-kernel package.
+It may block kernel upgrades because it requires one `kernel-uname-r`. The
+akmod replacement has been prepared but is not installed. See
+[`akmod.md`](akmod.md) for the build and replacement commands.
+
 ## Reinstalace barevného profilu
 
 Toto je postup pro změny RGB-IR kódu nebo barevného nastavení. Kernelový RPM kvůli nim znovu instalovat není potřeba.
